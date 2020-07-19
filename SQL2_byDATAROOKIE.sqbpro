@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:\Users\Belle\Desktop\SQL by DATAROOKIE\chinook.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="125"/><column_width id="3" width="4436"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,13:mainusa_customers"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="albums" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="84"/><column index="2" value="300"/><column index="3" value="76"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="usa_customers" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="111"/><column index="2" value="97"/><column index="3" value="98"/><column index="4" value="166"/><column index="5" value="216"/><column index="6" value="116"/><column index="7" value="55"/><column index="8" value="78"/><column index="9" value="106"/><column index="10" value="148"/><column index="11" value="148"/><column index="12" value="212"/><column index="13" value="131"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">SELECT 
+	A.name AS genreName,
+	B.name AS trackName,
+	B.milliseconds,
+	B.bytes
+FROM genres AS A
+LEFT JOIN tracks AS B
+ON A.genreid = B.genreid;</sql><sql name="SQL 2">SELECT
+	A.name AS artistName,
+	B.title,
+	C.name AS trackName
+FROM artists A
+JOIN albums B ON A.artistid = B.artistid
+JOIN tracks C ON B.albumid = C.albumid
+WHERE A.artistid = 100;</sql><sql name="SQL 3">SELECT DISTINCT
+	t1.firstname,
+	t1.lastname,
+	t5.name AS genreName
+FROM customers t1
+JOIN invoices t2 ON t1.customerid = t2.CustomerId
+JOIN invoice_items t3 ON t2.invoiceid = t3.InvoiceId
+JOIN tracks t4 ON t3.trackid =t4.TrackId
+JOIN genres t5 ON t4.genreid = t5.GenreId
+WHERE t1.customerid = 35;</sql><sql name="SQL 4">SELECT firstname, lastname, email FROM
+	(
+		SELECT * FROM customers
+		WHERE country = 'USA'
+	);</sql><sql name="SQL 5">SELECT * FROM customers
+JOIN (
+	SELECT * FROM invoices
+	WHERE STRFTIME('%Y', invoicedate) = '2012'
+) AS invoices2012
+ON customers.customerid = invoices2012.customerid;
+</sql><sql name="SQL 6">-- common table expression
+-- WITH
+WITH
+	invoices2012 AS (
+		SELECT * FROM invoices
+		WHERE STRFTIME('%Y', invoicedate) = '2012'
+	)
+SELECT * FROM customers A
+JOIN invoices2012 B
+ON A.customerid = B.CustomerId
+WHERE A.country = 'USA';</sql><sql name="SQL 7">-- common table expression
+-- WITH
+WITH
+	invoices2012 AS (
+		SELECT * FROM invoices
+		WHERE STRFTIME('%Y', invoicedate) = '2012'
+	),
+	usa_customers AS (
+	SELECT * FROM customers
+	WHERE country = 'USA'
+	)
+	
+SELECT * FROM usa_customers A
+JOIN invoices2012 B ON A.customerid = B.customerid;	</sql><sql name="SQL 8">-- table vs. VIEW
+
+CREATE VIEW usa_customers AS
+	SELECT * FROM customers
+	WHERE country = 'USA';</sql><sql name="SQL 9">/*SELECT	
+	ROW_NUMBER() OVER() AS rowNum,
+	firstname || ' ' || lastname AS fullName,
+	Country
+FROM customers;*/
+
+SELECT	
+	COUNT(*) OVER(PARTITION BY country),
+	firstname || ' ' || lastname AS fullName,
+	Country
+FROM customers;</sql><sql name="SQL 10">SELECT 
+	*,
+	SUM(total_invoice) OVER(PARTITION BY year ORDER BY month) AS runningTotal
+FROM (
+SELECT 
+	STRFTIME('%Y', invoicedate) AS year,
+	STRFTIME('%m', invoicedate) AS month,
+	SUM(total) AS total_invoice
+FROM invoices
+GROUP BY year, month);</sql><current_tab id="9"/></tab_sql></sqlb_project>
